@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Поиск по базе данных / Database Search</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #38bdf8;
+      --accent-2: #22c55e;
+      --border: #334155;
+      --light-bg: #f8fafc;
+      --light-panel: #ffffff;
+      --light-text: #0f172a;
+      --light-muted: #475569;
+      --light-border: #cbd5e1;
+      --shadow: 0 12px 40px rgba(0,0,0,.25);
+      --radius: 18px;
+      --container: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #0b1220 0%, #111827 100%);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .container {
+      width: min(var(--container), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(8px);
+      background: rgba(15, 23, 42, .82);
+      border-bottom: 1px solid rgba(148, 163, 184, .15);
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 0;
+    }
+
+    .brand {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: .2px;
+    }
+
+    .lang-switch {
+      display: inline-flex;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(148, 163, 184, .2);
+      border-radius: 999px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .lang-btn {
+      border: 0;
+      cursor: pointer;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text);
+      font-weight: 700;
+      transition: .2s ease;
+    }
+
+    .lang-btn.active {
+      background: var(--accent);
+      color: #082f49;
+    }
+
+    .hero {
+      padding: 56px 0 34px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(31,41,55,.96), rgba(17,24,39,.98));
+      border: 1px solid rgba(148, 163, 184, .16);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card {
+      padding: 34px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, .12);
+      border: 1px solid rgba(56, 189, 248, .35);
+      color: #bae6fd;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .2px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: clamp(34px, 5vw, 56px);
+      line-height: 1.08;
+    }
+
+    .lead {
+      font-size: 18px;
+      color: #cbd5e1;
+      margin: 0 0 24px;
+      max-width: 760px;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin: 24px 0 22px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 48px;
+      padding: 0 20px;
+      border-radius: 12px;
+      font-weight: 700;
+      transition: transform .15s ease, opacity .15s ease, background .15s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #60a5fa);
+      color: #082f49;
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(148, 163, 184, .24);
+      color: var(--text);
+    }
+
+    .hero-points {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .hero-point {
+      padding: 14px 16px;
+      border: 1px solid rgba(148, 163, 184, .14);
+      border-radius: 14px;
+      background: rgba(255,255,255,.03);
+      color: #dbeafe;
+      font-weight: 600;
+    }
+
+    .price-card {
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .price {
+      font-size: 56px;
+      font-weight: 800;
+      line-height: 1;
+      margin: 8px 0;
+    }
+
+    .price-note {
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .list {
+      margin: 0;
+      padding-left: 20px;
+      color: #d1d5db;
+    }
+
+    .section {
+      padding: 18px 0 20px;
+    }
+
+    .section h2 {
+      margin: 0 0 14px;
+      font-size: clamp(28px, 4vw, 40px);
+      line-height: 1.15;
+    }
+
+    .section-intro {
+      color: #cbd5e1;
+      font-size: 18px;
+      margin: 0 0 22px;
+      max-width: 900px;
+    }
+
+    .grid-3, .grid-2 {
+      display: grid;
+      gap: 20px;
+    }
+
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .feature-card, .shot-card, .lang-card, .demo-card, .final-card {
+      padding: 24px;
+    }
+
+    .feature-card h3,
+    .shot-card h3,
+    .lang-card h3,
+    .demo-card h3,
+    .final-card h3 {
+      margin: 0 0 12px;
+      font-size: 22px;
+    }
+
+    .feature-card p,
+    .shot-card p,
+    .lang-card p,
+    .demo-card p,
+    .final-card p {
+      margin: 0;
+      color: #cbd5e1;
+    }
+
+    .shot-box {
+      margin-top: 16px;
+      height: 250px;
+      border-radius: 16px;
+      border: 2px dashed rgba(148, 163, 184, .35);
+      background:
+        linear-gradient(135deg, rgba(56,189,248,.08), rgba(34,197,94,.06));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #93c5fd;
+      font-weight: 700;
+      padding: 16px;
+    }
+
+    .lang-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .lang-item {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(148, 163, 184, .14);
+      color: #e2e8f0;
+      font-weight: 700;
+    }
+
+    .demo-limit {
+      margin-top: 14px;
+      padding: 14px 16px;
+      background: rgba(248, 113, 113, .08);
+      border: 1px solid rgba(248, 113, 113, .24);
+      border-radius: 14px;
+      color: #fecaca;
+    }
+
+    .footer {
+      padding: 30px 0 50px;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    [data-lang] { display: none; }
+    [data-lang].visible { display: block; }
+
+    @media (max-width: 980px) {
+      .hero-grid, .grid-3, .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-points,
+      .lang-list {
+        grid-template-columns: 1fr;
+      }
+
+      .price {
+        font-size: 46px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero-card, .price-card, .feature-card, .shot-card, .lang-card, .demo-card, .final-card {
+        padding: 20px;
+      }
+
+      .topbar-inner {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .lang-switch {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand" data-lang="ru">Поиск по базе данных</div>
+      <div class="brand" data-lang="en">Database Search</div>
+      <div class="lang-switch" aria-label="Language switcher">
+        <button class="lang-btn active" id="btn-ru" type="button">Русский</button>
+        <button class="lang-btn" id="btn-en" type="button">English</button>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="card hero-card">
+          <div class="badge" data-lang="ru">Профессиональный инструмент для SQL Server и связанных серверов</div>
+          <div class="badge" data-lang="en">Professional tool for SQL Server and linked servers</div>
+
+          <div data-lang="ru">
+            <h1>Найдите нужный объект, код, таблицу или данные за секунды</h1>
+            <p class="lead">Программа «Поиск по базе данных» помогает быстро находить объекты SQL Server, анализировать структуру баз, просматривать код, искать по содержимому таблиц, работать с индексами, статистикой и связанными серверами из одного интерфейса.</p>
+            <div class="cta-row">
+              <a class="btn btn-primary" href="#demo">Скачать демоверсию</a>
+              <a class="btn btn-secondary" href="#features">Посмотреть возможности</a>
+            </div>
+            <div class="hero-points">
+              <div class="hero-point">Поиск по именам и по фрагментам кода</div>
+              <div class="hero-point">Работа по одной БД или по всем базам сервера</div>
+              <div class="hero-point">Поддержка связанных серверов MySQL и Postgres</div>
+              <div class="hero-point">Мультиязычный интерфейс для международных команд</div>
+            </div>
+          </div>
+
+          <div data-lang="en">
+            <h1>Find the right object, code, table, or data in seconds</h1>
+            <p class="lead">Database Search helps you quickly locate SQL Server objects, inspect database structures, review code, search inside table data, work with indexes, performance statistics, and linked servers — all from one interface.</p>
+            <div class="cta-row">
+              <a class="btn btn-primary" href="#demo">Download Demo</a>
+              <a class="btn btn-secondary" href="#features">Explore Features</a>
+            </div>
+            <div class="hero-points">
+              <div class="hero-point">Search by names and code fragments</div>
+              <div class="hero-point">Work with one database or all databases on the server</div>
+              <div class="hero-point">Linked server support for MySQL and Postgres</div>
+              <div class="hero-point">Multilingual interface for international teams</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card price-card">
+          <div>
+            <div class="badge" data-lang="ru">Стоимость лицензии</div>
+            <div class="badge" data-lang="en">License Price</div>
+            <div class="price">$99</div>
+            <div class="price-note" data-lang="ru">Единоразовая покупка программы</div>
+            <div class="price-note" data-lang="en">One-time software purchase</div>
+          </div>
+
+          <div data-lang="ru">
+            <ul class="list">
+              <li>Быстрое внедрение без сложной подготовки</li>
+              <li>Подходит разработчикам, администраторам и аналитикам</li>
+              <li>Ускоряет поиск объектов и разбор структуры БД</li>
+            </ul>
+          </div>
+
+          <div data-lang="en">
+            <ul class="list">
+              <li>Fast onboarding with minimal setup</li>
+              <li>Useful for developers, DBAs, and analysts</li>
+              <li>Speeds up object discovery and database analysis</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="features">
+      <div class="container">
+        <h2 data-lang="ru">Ключевые возможности</h2>
+        <h2 data-lang="en">Core Features</h2>
+        <p class="section-intro" data-lang="ru">Программа объединяет в одном окне повседневные задачи поиска, навигации, анализа и диагностики SQL Server. Ниже — основные функции, которые особенно полезны в работе с большими корпоративными базами данных.</p>
+        <p class="section-intro" data-lang="en">The application brings together everyday SQL Server search, navigation, analysis, and diagnostics in one window. Below are the features that matter most when working with large enterprise databases.</p>
+
+        <div class="grid-3">
+          <div class="card feature-card">
+            <h3 data-lang="ru">Глубокий поиск по объектам БД</h3>
+            <h3 data-lang="en">Deep Database Object Search</h3>
+            <p data-lang="ru">Поиск по хранимым процедурам, функциям, таблицам, полям, триггерам, индексам, ограничениям, учетным записям и другим объектам как по имени, так и по фрагменту кода.</p>
+            <p data-lang="en">Search stored procedures, functions, tables, fields, triggers, indexes, constraints, logins, and other objects by name or by code fragment.</p>
+          </div>
+
+          <div class="card feature-card">
+            <h3 data-lang="ru">Поиск по всем базам сервера</h3>
+            <h3 data-lang="en">Search Across All Databases</h3>
+            <p data-lang="ru">Ищите по выбранной базе данных или сразу по всем доступным базам сервера. Это особенно удобно в сложных системах с большим количеством БД.</p>
+            <p data-lang="en">Search in a selected database or across all available databases on the server. Especially useful in complex environments with many databases.</p>
+          </div>
+
+          <div class="card feature-card">
+            <h3 data-lang="ru">Поиск в содержимом таблиц</h3>
+            <h3 data-lang="en">Search Inside Table Data</h3>
+            <p data-lang="ru">Находите текстовые фрагменты в данных таблиц по всем таблицам базы или по маске имен таблиц. Удобно для поиска клиентов, документов, настроек и следов данных.</p>
+            <p data-lang="en">Find text fragments stored inside table data across all tables or by table-name mask. Useful for locating clients, documents, settings, and data traces.</p>
+          </div>
+
+          <div class="card feature-card">
+            <h3 data-lang="ru">Удобная навигация по таблицам</h3>
+            <h3 data-lang="en">Convenient Table Navigation</h3>
+            <p data-lang="ru">Открывайте найденные таблицы двойным щелчком, просматривайте поля, свойства и индексы, сортируйте результаты по столбцам и переходите к связанным объектам.</p>
+            <p data-lang="en">Open discovered tables with a double click, inspect fields, properties, and indexes, sort result sets by columns, and move through related objects.</p>
+          </div>
+
+          <div class="card feature-card">
+            <h3 data-lang="ru">Просмотр кода с подсветкой</h3>
+            <h3 data-lang="en">Code Viewer with Highlighting</h3>
+            <p data-lang="ru">Код процедур и функций показывается в отдельном окне с цветовой разметкой, что делает чтение и анализ логики заметно удобнее.</p>
+            <p data-lang="en">Procedure and function code is displayed in a separate viewer with syntax highlighting, making code reading and logic analysis much easier.</p>
+          </div>
+
+          <div class="card feature-card">
+            <h3 data-lang="ru">Связанные серверы и SQL-файлы</h3>
+            <h3 data-lang="en">Linked Servers and SQL Files</h3>
+            <p data-lang="ru">Используйте поиск по SQL-файлам на диске, а также по подлинкованным серверам MySQL и Postgres, чтобы видеть больше, чем в пределах одного SQL Server.</p>
+            <p data-lang="en">Search SQL files on disk and work with linked MySQL and Postgres servers to go beyond the boundaries of a single SQL Server instance.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="grid-2">
+          <div class="card feature-card">
+            <h3 data-lang="ru">Инструменты анализа и администрирования</h3>
+            <h3 data-lang="en">Analysis and Administration Tools</h3>
+            <p data-lang="ru">Просмотр выполняемых процессов, остановка зависших сессий, анализ и перестройка индексов, статистика ожиданий, статистика задержек ввода-вывода, статистика tempdb, выполнение собственных SQL-запросов и сохранение результатов в Excel.</p>
+            <p data-lang="en">Inspect running processes, stop blocked sessions, analyze and rebuild indexes, review wait statistics, I/O latency statistics, tempdb statistics, execute your own SQL queries, and export results to Excel.</p>
+          </div>
+
+          <div class="card feature-card">
+            <h3 data-lang="ru">Сравнение таблиц и ускорение диагностики</h3>
+            <h3 data-lang="en">Table Comparison and Faster Diagnostics</h3>
+            <p data-lang="ru">Сравнивайте таблицы на одном сервере или между разными серверами, просматривайте уникальные значения полей, открывайте скрипты в SSMS и быстрее находите источник ошибок, расхождений и проблем с производительностью.</p>
+            <p data-lang="en">Compare tables on the same server or across different servers, inspect unique field values, open scripts in SSMS, and find the source of inconsistencies, errors, and performance issues faster.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2 data-lang="ru">Мультиязычный интерфейс</h2>
+        <h2 data-lang="en">Multilingual Interface</h2>
+        <div class="grid-2">
+          <div class="card lang-card">
+            <h3 data-lang="ru">Программа подходит для международной работы</h3>
+            <h3 data-lang="en">Built for International Use</h3>
+            <p data-lang="ru">Интерфейс программы поддерживает несколько языков, что удобно для команд, работающих с клиентами, подрядчиками и коллегами из разных стран.</p>
+            <p data-lang="en">The software includes a multilingual interface, making it suitable for teams working with clients, contractors, and colleagues from different countries.</p>
+            <div class="lang-list">
+              <div class="lang-item" data-lang="ru">Русский</div>
+              <div class="lang-item" data-lang="ru">Английский</div>
+              <div class="lang-item" data-lang="ru">Немецкий</div>
+              <div class="lang-item" data-lang="ru">Французский</div>
+              <div class="lang-item" data-lang="ru">Испанский</div>
+              <div class="lang-item" data-lang="ru">Португальский</div>
+
+              <div class="lang-item" data-lang="en">Russian</div>
+              <div class="lang-item" data-lang="en">English</div>
+              <div class="lang-item" data-lang="en">German</div>
+              <div class="lang-item" data-lang="en">French</div>
+              <div class="lang-item" data-lang="en">Spanish</div>
+              <div class="lang-item" data-lang="en">Portuguese</div>
+            </div>
+          </div>
+
+          <div class="card shot-card">
+            <h3 data-lang="ru">Гибкость для разных специалистов</h3>
+            <h3 data-lang="en">Useful Across Roles</h3>
+            <p data-lang="ru">Разработчики получают быстрый доступ к коду и объектам, аналитики — к структуре и данным, администраторы — к диагностике и индексации. Один инструмент закрывает сразу несколько задач.</p>
+            <p data-lang="en">Developers get fast access to code and objects, analysts get visibility into structures and data, and DBAs get diagnostics and index maintenance tools. One application covers multiple workflows.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2 data-lang="ru">Заглушки для скриншотов</h2>
+        <h2 data-lang="en">Screenshot Placeholders</h2>
+        <div class="grid-3">
+          <div class="card shot-card">
+            <h3 data-lang="ru">Главное окно программы</h3>
+            <h3 data-lang="en">Main Application Window</h3>
+            <p data-lang="ru">Сюда можно вставить скриншот интерфейса с поисковой выдачей и панелью инструментов.</p>
+            <p data-lang="en">Insert a screenshot of the main interface with the search results and toolbar here.</p>
+            <div class="shot-box" data-lang="ru">МЕСТО ДЛЯ СКРИНШОТА №1</div>
+            <div class="shot-box" data-lang="en">SCREENSHOT PLACEHOLDER #1</div>
+          </div>
+
+          <div class="card shot-card">
+            <h3 data-lang="ru">Просмотр кода и результатов</h3>
+            <h3 data-lang="en">Code Viewer and Results</h3>
+            <p data-lang="ru">Здесь хорошо показать подсветку SQL-кода, результаты поиска и навигацию по объектам.</p>
+            <p data-lang="en">A good place for SQL syntax highlighting, search results, and object navigation screenshots.</p>
+            <div class="shot-box" data-lang="ru">МЕСТО ДЛЯ СКРИНШОТА №2</div>
+            <div class="shot-box" data-lang="en">SCREENSHOT PLACEHOLDER #2</div>
+          </div>
+
+          <div class="card shot-card">
+            <h3 data-lang="ru">Диагностика и статистика</h3>
+            <h3 data-lang="en">Diagnostics and Statistics</h3>
+            <p data-lang="ru">Подойдет скриншот статистики ожиданий, процессов, анализа индексов или статистики I/O.</p>
+            <p data-lang="en">Ideal for wait statistics, running processes, index analysis, or I/O statistics screenshots.</p>
+            <div class="shot-box" data-lang="ru">МЕСТО ДЛЯ СКРИНШОТА №3</div>
+            <div class="shot-box" data-lang="en">SCREENSHOT PLACEHOLDER #3</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="demo">
+      <div class="container">
+        <div class="grid-2">
+          <div class="card demo-card">
+            <h3 data-lang="ru">Демоверсия</h3>
+            <h3 data-lang="en">Demo Version</h3>
+            <p data-lang="ru">Попробуйте программу перед покупкой. Для размещения ссылки замените заглушку ниже на реальный адрес файла или страницы загрузки.</p>
+            <p data-lang="en">Try the software before purchase. Replace the placeholder below with the real file URL or download page.</p>
+            <div class="cta-row" style="margin-top:18px; margin-bottom:0;">
+              <a class="btn btn-primary" href="#" onclick="return false;" data-lang="ru">Скачать демоверсию (заглушка)</a>
+              <a class="btn btn-primary" href="#" onclick="return false;" data-lang="en">Download Demo (placeholder)</a>
+            </div>
+          </div>
+
+          <div class="card demo-card">
+            <h3 data-lang="ru">Ограничения демоверсии</h3>
+            <h3 data-lang="en">Demo Limitations</h3>
+            <div class="demo-limit" data-lang="ru">
+              1. Не более 10 результатов поиска по базе данных.<br>
+              2. При поиске по всем базам — не более 10 результатов по каждой категории объектов сервера.<br>
+              3. Ограничен функционал по статистике.<br>
+              4. Ограничен поиск по подлинкованным серверам MySQL и Postgres.<br>
+              5. После каждой 10-й операции показывается рекламная заставка.
+            </div>
+            <div class="demo-limit" data-lang="en">
+              1. No more than 10 search results per database.<br>
+              2. When searching across all databases — no more than 10 results for each server object category.<br>
+              3. Statistics functionality is limited.<br>
+              4. Search on linked MySQL and Postgres servers is limited.<br>
+              5. An advertising splash screen appears after every 10th operation.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="card final-card">
+          <h3 data-lang="ru">Почему это выгодно</h3>
+          <h3 data-lang="en">Why It Pays Off</h3>
+          <p data-lang="ru">Когда нужный объект, таблицу, индекс или фрагмент кода можно найти сразу, команда тратит меньше времени на ручной поиск и быстрее решает реальные задачи. За $99 программа окупается очень быстро — особенно если вы регулярно работаете с несколькими базами данных, сложной структурой SQL Server и большим количеством служебных объектов.</p>
+          <p data-lang="en">When the required object, table, index, or code fragment can be found immediately, your team spends less time on manual discovery and more time solving real problems. At $99, the software can pay for itself quickly — especially if you work with multiple databases, complex SQL Server structures, and a large number of service objects.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div data-lang="ru">© Поиск по базе данных. Продающая страница с русско-английским переключателем.</div>
+      <div data-lang="en">© Database Search. Sales landing page with Russian-English switcher.</div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const buttons = {
+        ru: document.getElementById('btn-ru'),
+        en: document.getElementById('btn-en')
+      };
+
+      const switchLanguage = (lang) => {
+        document.documentElement.lang = lang;
+        document.querySelectorAll('[data-lang]').forEach(el => {
+          el.classList.toggle('visible', el.getAttribute('data-lang') === lang);
+        });
+        buttons.ru.classList.toggle('active', lang === 'ru');
+        buttons.en.classList.toggle('active', lang === 'en');
+        localStorage.setItem('db-search-lang', lang);
+      };
+
+      buttons.ru.addEventListener('click', () => switchLanguage('ru'));
+      buttons.en.addEventListener('click', () => switchLanguage('en'));
+
+      const stored = localStorage.getItem('db-search-lang');
+      switchLanguage(stored === 'en' ? 'en' : 'ru');
+    })();
+  </script>
+</body>
+</html>
