@@ -728,7 +728,7 @@
           </article>
 
           <article class="card other-card">
-            <a href="https://governorv.github.io/Licman/" target="_blank" rel="noopener">
+            <a href="https://governorv.github.io/Licman/#ru" target="_blank" rel="noopener">
               <img src="licman_banner.png" alt="Менеджер лицензий" data-lang="ru">
               <img src="licman_banner_en.png" alt="License Manager" data-lang="en">
             </a>
@@ -737,13 +737,13 @@
               <h3 data-lang="en">License Manager</h3>
               <p data-lang="ru">Учёт лицензий, контроль сроков действия, ответственные, уведомления и экспорт в Excel.</p>
               <p data-lang="en">Track licenses, expiration dates, owners, notifications and Excel exports.</p>
-              <a class="btn btn-secondary" href="https://governorv.github.io/Licman/" target="_blank" rel="noopener" data-lang="ru">Страница</a>
+              <a class="btn btn-secondary" href="https://governorv.github.io/Licman/#ru" target="_blank" rel="noopener" data-lang="ru">Страница</a>
               <a class="btn btn-secondary" href="https://governorv.github.io/Licman/#en" target="_blank" rel="noopener" data-lang="en">Page</a>
             </div>
           </article>
 
           <article class="card other-card">
-            <a href="https://governorv.github.io/BoxPalletizer/" target="_blank" rel="noopener">
+            <a href="https://governorv.github.io/BoxPalletizer/#ru" target="_blank" rel="noopener">
               <img src="palletizer_banner.png" alt="Паллетировщик" data-lang="ru">
               <img src="palletizer_banner_en.png" alt="Palletizer" data-lang="en">
             </a>
@@ -752,7 +752,7 @@
               <h3 data-lang="en">Palletizer</h3>
               <p data-lang="ru">Расчёт укладки коробов на поддон, 3D-визуализация, ограничения и отчёты.</p>
               <p data-lang="en">Plan pallet stacking with 3D visualization, constraints and exportable reports.</p>
-              <a class="btn btn-secondary" href="https://governorv.github.io/BoxPalletizer/" target="_blank" rel="noopener" data-lang="ru">Страница</a>
+              <a class="btn btn-secondary" href="https://governorv.github.io/BoxPalletizer/#ru" target="_blank" rel="noopener" data-lang="ru">Страница</a>
               <a class="btn btn-secondary" href="https://governorv.github.io/BoxPalletizer/#en" target="_blank" rel="noopener" data-lang="en">Page</a>
             </div>
           </article>
@@ -812,13 +812,26 @@
         }
 
         localStorage.setItem('db-search-lang', lang);
+
+        const h = (window.location.hash || '').toLowerCase();
+        if (h === '#ru' || h === '#en' || h === '') {
+          history.replaceState(null, '', '#' + lang);
+        }
       };
 
       buttons.ru.addEventListener('click', () => switchLanguage('ru'));
       buttons.en.addEventListener('click', () => switchLanguage('en'));
 
+      const hash = (window.location.hash || '').toLowerCase();
       const stored = localStorage.getItem('db-search-lang');
-      switchLanguage(stored === 'en' ? 'en' : 'ru');
+      const initialLang = hash === '#en' ? 'en' : hash === '#ru' ? 'ru' : stored === 'en' ? 'en' : 'ru';
+      switchLanguage(initialLang);
+
+      window.addEventListener('hashchange', () => {
+        const h = (window.location.hash || '').toLowerCase();
+        if (h === '#en') switchLanguage('en');
+        if (h === '#ru') switchLanguage('ru');
+      });
     })();
   </script>
 </body>
