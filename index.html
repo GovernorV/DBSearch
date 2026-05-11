@@ -786,6 +786,19 @@
         en: document.getElementById('btn-en')
       };
 
+      const crossPromoLinks = {
+        ru: [
+          'https://governorv.github.io/BoxPriceCalculator/#ru',
+          'https://governorv.github.io/Licman/#ru',
+          'https://governorv.github.io/BoxPalletizer/#ru'
+        ],
+        en: [
+          'https://governorv.github.io/BoxPriceCalculator/#en',
+          'https://governorv.github.io/Licman/#en',
+          'https://governorv.github.io/BoxPalletizer/#en'
+        ]
+      };
+
       const switchLanguage = (lang) => {
         document.documentElement.lang = lang;
         document.querySelectorAll('[data-lang]').forEach(el => {
@@ -810,6 +823,10 @@
           shotStat.src = lang === 'ru' ? 'stat.jpg' : 'stat_eng.jpg';
           shotStat.alt = lang === 'ru' ? 'Статистика' : 'Statistics';
         }
+
+        document.querySelectorAll('.other-card > a').forEach((link, index) => {
+          if (crossPromoLinks[lang][index]) link.href = crossPromoLinks[lang][index];
+        });
 
         localStorage.setItem('db-search-lang', lang);
 
