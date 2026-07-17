@@ -369,6 +369,48 @@
       margin-top: 24px;
     }
 
+    .review-card {
+      padding: clamp(24px, 4vw, 38px);
+      border-left: 5px solid var(--accent);
+    }
+
+    .review-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 6px;
+    }
+
+    .review-source {
+      color: #5eead4;
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .review-score {
+      color: #fbbf24;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .review-by {
+      color: var(--muted);
+      margin: 0 0 22px;
+    }
+
+    .review-copy {
+      max-width: 900px;
+      color: #dbeafe;
+      line-height: 1.7;
+    }
+
+    .review-copy p { margin: 0 0 14px; }
+    .review-card .btn { margin-top: 8px; }
+
+    html.day-theme .review-source { color: var(--accent); }
+    html.day-theme .review-copy { color: var(--text); }
+
     .other-card {
       overflow: hidden;
       padding: 0;
@@ -813,6 +855,35 @@
             </div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section class="section" id="reviews">
+      <div class="container">
+        <h2 data-lang="ru">Отзывы</h2>
+        <h2 data-lang="en">Reviews</h2>
+        <p class="section-intro" data-lang="ru">Независимый обзор программы на Softpedia.</p>
+        <p class="section-intro" data-lang="en">An independent Softpedia review of the application.</p>
+        <article class="card review-card">
+          <div class="review-topline">
+            <span class="review-source">Softpedia Review</span>
+            <span class="review-score">★ 3.5/5</span>
+          </div>
+          <p class="review-by" data-lang="ru">Обзор подготовил Andrei Verdeanu</p>
+          <p class="review-by" data-lang="en">Reviewed by Andrei Verdeanu</p>
+          <div class="review-copy" data-lang="ru">
+            <p>Softpedia отмечает, что Database Search даёт централизованный доступ к экземплярам Microsoft SQL Server: помогает находить объекты, изучать структуру баз, просматривать код и табличные данные.</p>
+            <p>Рецензент выделяет простой интерфейс и быстрые экранные команды, одновременный поиск по нескольким базам, подсветку кода, работу со связанными MySQL и PostgreSQL, а также анализ индексов и статистики.</p>
+            <p>В итоге программу называют компактным, но функциональным инструментом для поиска, навигации, анализа и диагностики SQL Server.</p>
+          </div>
+          <div class="review-copy" data-lang="en">
+            <p>Softpedia highlights Database Search as a centralized way to access Microsoft SQL Server instances, locate objects, inspect database structures, review code, and preview tabular data.</p>
+            <p>The reviewer praises its straightforward interface and quick-access controls, concurrent multi-database searches, highlighted code previews, linked MySQL and PostgreSQL access, and index and statistics analysis.</p>
+            <p>The verdict calls it a compact yet capable tool for SQL Server search, navigation, analysis, and diagnostics.</p>
+          </div>
+          <a class="btn btn-secondary" href="https://www.softpedia.com/get/Internet/Servers/Database-Utils/Database-Search.shtml" target="_blank" rel="noopener" data-lang="ru">Читать полный обзор на Softpedia</a>
+          <a class="btn btn-secondary" href="https://www.softpedia.com/get/Internet/Servers/Database-Utils/Database-Search.shtml" target="_blank" rel="noopener" data-lang="en">Read the full review on Softpedia</a>
+        </article>
       </div>
     </section>
 
